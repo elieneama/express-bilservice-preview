@@ -141,7 +141,9 @@
   gsap.defaults({ ease: 'expo.out' });
 
   if (window.Lenis) {
-    lenis = new Lenis({ lerp: 0.12, anchors: { offset: -96 } });
+    // Myk scrolling på hele siden: lav lerp gir en glatt, «flytende» følelse på mus og styreflate.
+    // Mobil beholder telefonens egen scrolling (den er allerede myk), men ankerlenker glir også der.
+    lenis = new Lenis({ lerp: 0.085, smoothWheel: true, anchors: { offset: -96, duration: 1.3, easing: (x) => 1 - Math.pow(1 - x, 4) } });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((t) => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
