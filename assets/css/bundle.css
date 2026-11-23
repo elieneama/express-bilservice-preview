@@ -229,6 +229,8 @@ body.menu-open .nav { background: var(--color-night); color: var(--color-night-i
 .sec--s { padding-top: var(--section-gap-s); }
 main > :last-child { padding-bottom: var(--section-gap); }
 .block { background: var(--color-paper-2); color: var(--color-ink); padding-bottom: var(--section-gap); }
+/* En vanlig seksjon som følges av en farget flate får luft under seg, ellers står innholdet rett på kanten av flaten */
+:is(.sec, .sec--s):not(.block):has(+ :is(.block, .dark, .book)) { padding-bottom: var(--section-gap); }
 .head12 { display: grid; gap: var(--space-md) var(--gap-columns); align-items: end; margin-bottom: var(--space-2xl); }
 .head12 h2 { font-size: clamp(2.25rem, 4.2vw, 4rem); line-height: 1.02; }
 
