@@ -1,0 +1,23 @@
+# Express Bilservice: HTTP-headere for Cloudflare Pages og Netlify. Lages av tools/build.mjs (ikke rediger).
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-U14pH+m8SEQMParoneag87G39fpQmuo6lcshqNskzv4=' 'sha256-x7XtiO7Q27q5FISFm9RQ9MbzsgkbTBa8RSNFtYG7oR0=' 'sha256-Ga0dGSs8LLU0fG/NgqYjXJN/nI7FfyC05O5nPZ9ztcc='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; frame-src https://www.openstreetmap.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  X-Frame-Options: SAMEORIGIN
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+/assets/img/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/css/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/js/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/vendor/*
+  Cache-Control: public, max-age=2592000
+/assets/video/*
+  Cache-Control: public, max-age=604800
+/assets/brand/*
+  Cache-Control: public, max-age=604800

@@ -122,6 +122,8 @@
       btn.setAttribute('aria-pressed', String(!held));
     };
     btn.addEventListener('click', () => { held = !held; sync(); });
+    // Videoen lastes ikke før man nærmer seg den (preload="none" i HTML), så den ikke stjeler båndbredde fra toppbildet.
+    if ('IntersectionObserver' in window) { const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { v.preload = 'auto'; near.disconnect(); } }, { rootMargin: '600px 0px' }); near.observe(wrap); }
     if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { seen = e.isIntersecting; sync(); }, { threshold: 0.2 }).observe(wrap);
     else { seen = true; sync(); }
   });
