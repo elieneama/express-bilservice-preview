@@ -253,7 +253,7 @@ main > :last-child { padding-bottom: var(--section-gap); }
 .book__num { justify-self: start; font: 500 clamp(3rem, 16vw, 5rem)/0.95 var(--font-display); letter-spacing: -0.045em; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--color-accent-ink); text-decoration: none; }
 .book__num:hover { text-decoration: underline; text-decoration-thickness: 0.06em; text-underline-offset: 0.08em; }
 .dg { display: inline-block; overflow: clip; vertical-align: top; }
-.dg__i { display: inline-block; }
+.dg__i { display: inline-block; white-space: pre; }
 .book .status { color: var(--color-accent-ink); }
 
 /* ---------- Plates (flat concrete blocks) ---------- */

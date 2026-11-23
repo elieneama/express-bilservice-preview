@@ -256,7 +256,7 @@
 
   /* sitatet fylles inn ord for ord med scrollingen */
   $$('[data-scrub]').forEach((p) => {
-    gsap.fromTo(split(p, 'sw'), { opacity: 0.16 }, { opacity: 1, ease: 'none', stagger: 0.1, scrollTrigger: { trigger: p, start: 'top 82%', end: 'bottom 48%', scrub: true } });
+    gsap.fromTo(split(p, 'sw'), { opacity: 0.48 }, { opacity: 1, ease: 'none', stagger: 0.1, scrollTrigger: { trigger: p, start: 'top 82%', end: 'bottom 48%', scrub: true } });
   });
 
   /* telefonnummeret ruller inn tall for tall */
@@ -264,7 +264,7 @@
     const txt = a.textContent.trim();
     a.setAttribute('aria-label', a.getAttribute('aria-label') || txt);
     a.textContent = '';
-    const inner = [...txt].map((c) => { const o = make('span', 'dg'); o.setAttribute('aria-hidden', 'true'); const i = make('span', 'dg__i', c === ' ' ? ' ' : c); o.append(i); a.append(o); return i; });
+    const inner = [...txt].map((c) => { const o = make('span', 'dg'); o.setAttribute('aria-hidden', 'true'); const i = make('span', 'dg__i', c); o.append(i); a.append(o); return i; });
     gsap.fromTo(inner, { yPercent: 105 }, { yPercent: 0, duration: 0.8, stagger: 0.035, scrollTrigger: { trigger: a, start: 'top 88%' } });
   });
 
