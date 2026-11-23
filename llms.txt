@@ -1,0 +1,61 @@
+# Express Bilservice
+
+> Express Bilservice AS er et bilverksted på Volsdalsberga i Ålesund, med dekkhotell og døgnåpen bilvask. Mekonomen-verksted og Fagdekk/Point S-verksted. Stiftet 2002, 11 ansatte (Brønnøysundregistrene).
+
+In English: Express Bilservice AS is a car repair workshop in Ålesund, Norway (Volsdalsberga, 200 metres east of Color Line Stadion), with tyre storage and a 24/7 automatic car wash (exterior only). Part of the Mekonomen workshop chain and Fagdekk/Point S. Founded 2002. Service, EU roadworthiness inspection (EU-kontroll), diagnostics, repairs, tyres.
+
+## Fakta
+
+- Firma: Express Bilservice AS, org.nr. 984 589 808
+- Adresse: Sjømannsvegen 7, 6008 Ålesund (200 meter øst for Color Line Stadion)
+- Telefon: 70 13 26 00
+- E-post: verksted@expressbilservice.no
+- Åpningstider for verkstedet: mandag til fredag 08.00 til 16.00, stengt lørdag og søndag
+- Bilvask: automatisk, bare utvendig, åpen hele døgnet, alle dager
+- Bestill time: https://bestill.mekonomen.no/workshops?workshop=6060-013
+- Eiere: Jan-Harald Ness og Steinar Aasen
+- Kjeder: Mekonomen og Fagdekk/Point S
+- Kart: https://www.google.com/maps/search/?api=1&query=Express%20Bilservice%20AS%2C%20Sj%C3%B8mannsvegen%207%2C%206008%20%C3%85lesund
+- Facebook: https://www.facebook.com/expressbilservice/
+- Brønnøysundregistrene: https://virksomhet.brreg.no/nb/oppslag/enheter/984589808
+
+## Tjenester
+
+- [Verksted](https://www.expressbilservice.no/verksted/): service etter fabrikantens anvisninger (garantien består, stempel i serviceboka), EU-kontroll, diagnose, oljeskift, bremser, eksosanlegg på dagen, støtdempere, bilbatteri, småreparasjoner, feriesjekk. Tar alt på bilen: ring og spør om det som ikke står her. Ett års assistanseforsikring ved service. Delbetaling over 4 eller 12 måneder uten nominell rente.
+- [Dekk og felg](https://www.expressbilservice.no/dekk/): dekkhotell, dekkskift, dekkomlegging, avbalansering, dekkreparasjon, hjulstilling, felger, person- og varebildekk.
+- [Bilvask](https://www.expressbilservice.no/bilvask/): automatisk utvendig vask i WashTec-maskin, åpen hele døgnet, alle dager. Ingen innvendig vask eller bilpleie.
+- [Bedrift](https://www.expressbilservice.no/bedrift/): verksted for hele bilparken, uansett merke og årsmodell.
+
+## Vanlige spørsmål
+
+- Beholder jeg nybilgarantien når dere tar service? Ja. Vi følger bilfabrikantens anvisninger og stempler serviceboka, så fabrikk- og nybilgarantien består.
+- Kan dere skifte eksosanlegget samme dag? Ja, eksosanlegg skifter vi på dagen. Ring 70 13 26 00 for time.
+- Kan jeg dele opp verkstedregningen? Ja. Du kan dele opp betalingen over 4 eller 12 måneder uten nominell rente.
+- Hvilke biler tar dere? Uansett bil eller årsmodell hjelper vi deg.
+- Hvordan bestiller jeg time? Bestill på nett hos Mekonomen, ring 70 13 26 00 eller send e-post til verksted@expressbilservice.no.
+- Når kan jeg bruke piggdekk i Ålesund? Fra 1. november til og med første søndag etter 2. påskedag. Krever føret det, er piggdekk lov også utenom perioden. Kilde: Statens vegvesen.
+- Hvor mye mønster må vinterdekkene ha? Minst 3 mm i vinterperioden, fra 1. november til og med første søndag etter 2. påskedag. Resten av året er kravet minst 1,6 mm. Dette gjelder biler opp til 3500 kg.
+- Har dere dekkhotell? Ja. Vi lagrer hjulene dine mellom sesongene og skifter når du kommer.
+- Har dere dekk til varebil? Ja. Vi har person- og varebildekk, og dekk til lette lastebiler.
+- Hvordan bestiller jeg dekkskift? Bestill på nett hos Mekonomen eller ring 70 13 26 00.
+- Er bilvasken åpen om natten? Ja. Bilvasken er automatisk og åpen hele døgnet, alle dager.
+- Må jeg bestille time til bilvask? Nei. Maskinen er automatisk og åpen hele døgnet, så du kommer når det passer deg.
+- Hvor ligger bilvasken? Lengst til venstre i bygget i Sjømannsvegen 7, 6008 Ålesund, under Bilvask-skiltet, 200 meter øst for Color Line Stadion.
+- Kan jeg få vasket bilen innvendig? Nei. Vi har bare automatisk utvendig vask, ingen innvendig vask eller bilpleie.
+- Tar dere service på firmabiler? Ja. Vi tar hånd om hele bilparken, uansett merke og årsmodell.
+- Hvordan får vi oversikt over kostnadene? Som bedriftskunde får dere oversikt over service- og reparasjonskostnadene for bilene.
+- Kan dere ta dekkene til firmabilene? Ja. Vi har dekkhotell og tar dekkskift for alle bilene i parken.
+- Får vi deler raskt? Ja. Delene kommer raskt gjennom Mekonomen.
+- Når ble Express Bilservice startet? I 2002. Bak sto ansatte fra et tidligere autosenter i Ålesund sentrum.
+- Hvem eier Express Bilservice? Verkstedet eies av Jan-Harald Ness og Steinar Aasen.
+- Hvor mange jobber hos Express Bilservice? 11 ansatte, ifølge Brønnøysundregistrene.
+- Hvilke kjeder er dere med i? Vi er Mekonomen-verksted og Fagdekk/Point S-verksted.
+- Hvor ligger Express Bilservice? I Sjømannsvegen 7, 6008 Ålesund, på Volsdalsberga. Vi ligger langs veien, 200 meter øst for Color Line Stadion.
+- Når har dere åpent? Verkstedet har åpent mandag til fredag fra 08.00 til 16.00, og er stengt lørdag og søndag. Bilvasken er automatisk og åpen hele døgnet, alle dager.
+
+## Sider
+
+- [Hjem](https://www.expressbilservice.no/): oversikt, tjenester og bestilling
+- [Om oss](https://www.expressbilservice.no/om-oss/): historien siden 2002, eierne og kjedene
+- [Kontakt og åpningstider](https://www.expressbilservice.no/kontakt/)
+- [Personvern](https://www.expressbilservice.no/personvern/): ingen informasjonskapsler, ingen sporing
