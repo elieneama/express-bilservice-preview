@@ -4,6 +4,7 @@
 /* Hallmark · pre-emit critique: P4 H5 E4 S4 R4 V4 · weakest: S, a grotesk on white could be any garage; the client's own building at dusk, their yellow signage colour and their own words (Gutta på berga står på) carry the specificity */
 /* Hallmark · waive 39b · a.btn--lg is 64px tall in the hero and the booking band · the client asked for a prominent Bestill time button, so the two booking controls are set one size up */
 /* Hallmark · waive 77 · the contact page's three questions sit on seven columns beside their head · a short practical FAQ about finding the workshop, set at the same composition as the other pages */
+/* Hallmark · dismissed 11 · the service tiles zoom their photo 5% on hover (fine pointers only, off with reduced motion); the client asked for an animated site, and the arrow tile carries the feedback too */
 /* Hallmark · dismissed 25 · .intro__text is a statement at section size, 30ch at 52px is an 830px line, not running prose */
 /* Hallmark · answered F4 · the booking band is signage yellow, so its one button inverts to sign black; every other primary is the yellow recipe */
 @import url("./fonts.css");
@@ -202,18 +203,48 @@ main > :last-child { padding-bottom: var(--section-gap); }
 .intro__text { margin: 0; max-width: 30ch; font: 500 var(--text-section)/1.12 var(--font-display); letter-spacing: -0.035em; color: var(--color-ink); }
 
 /* ---------- Service cards ---------- */
-.svc { display: grid; gap: var(--space-2xl) var(--gap-columns); margin: 0; padding: 0; list-style: none; }
-.svc__card { position: relative; display: grid; grid-template-rows: auto auto 1fr auto; gap: var(--space-md); }
-.svc__frame { aspect-ratio: 4 / 3; }
-.svc__t { font-size: var(--text-xl); }
+.svc { display: grid; gap: var(--space-xs); margin: 0; padding: 0; list-style: none; }
+/* Tjenestene som bildekort i en bento: stort kort for service, to ved siden av, tre under. Teksten står på bildet over en mørk gradient. */
+.svc__card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; min-height: 22rem; overflow: hidden; isolation: isolate; background: var(--color-night); color: var(--color-night-ink); }
+.svc__frame { position: absolute; inset: 0; z-index: -2; }
+.svc__frame img { transition: transform var(--dur-long) var(--ease-out); }
+.svc__card::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(to top, color-mix(in oklab, var(--scrim) 94%, transparent) 0%, color-mix(in oklab, var(--scrim) 80%, transparent) 38%, color-mix(in oklab, var(--scrim) 35%, transparent) 64%, transparent 86%); }
+.svc__body { display: grid; gap: var(--space-xs); justify-items: start; padding: var(--space-lg); }
+.svc__t { min-width: 0; font-size: var(--text-2xl); line-height: 1.1; color: var(--color-night-ink); overflow-wrap: break-word; }
 .svc__t a { color: inherit; text-decoration: none; }
 .svc__t a::after { content: ""; position: absolute; inset: 0; z-index: 3; }
-.svc__card:hover .svc__t a { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
-.svc__card:has(.svc__t a:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 6px; }
 .svc__t a:focus-visible { outline: none; }
-.svc__l { color: var(--color-ink-2); max-width: 34ch; }
-.svc__book { position: relative; z-index: 4; justify-self: start; display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-accent); text-decoration-thickness: 3px; text-underline-offset: 0.3em; }
-.svc__book:hover { text-decoration-color: var(--color-ink); }
+.svc__card:has(.svc__t a:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+.svc__l { max-width: 34ch; color: var(--color-night-muted); }
+.svc__book { position: relative; z-index: 4; display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-xs); padding: 0 var(--space-md); background: var(--color-accent); color: var(--color-accent-ink); font-weight: 600; text-decoration: none; transition: background-color var(--dur-short) var(--ease-out); }
+.svc__book:hover { background: var(--color-accent-hover); }
+.svc__book:focus-visible { outline: 2px solid var(--color-focus-night); outline-offset: 3px; }
+.svc__go { position: absolute; top: var(--space-md); right: var(--space-md); z-index: 2; display: grid; place-items: center; width: 48px; height: 48px; background: var(--color-night); color: var(--color-night-ink); transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out); }
+.svc__go svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--dur-short) var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .svc__card:hover .svc__frame img { transform: scale(1.05); }
+  .svc__card:hover .svc__go { background: var(--color-accent); color: var(--color-accent-ink); }
+  .svc__card:hover .svc__go svg { transform: translate(2px, -2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .svc__frame img, .svc__go svg { transition: none; }
+  .svc__card:hover .svc__frame img { transform: none; }
+}
+
+@media (min-width: 40.0625rem) {
+  .svc { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .svc__card:first-child, .svc__card:last-child { grid-column: 1 / -1; }
+  .svc__card:first-child { min-height: 30rem; }
+}
+@media (min-width: 60.0625rem) {
+  .svc { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: 20rem 20rem 24rem; }
+  .svc__card { min-height: 0; }
+  .svc__card:nth-child(1) { grid-column: 1 / span 7; grid-row: 1 / span 2; }
+  .svc__card:nth-child(2), .svc__card:nth-child(3) { grid-column: 8 / span 5; }
+  .svc__card:nth-child(n+4) { grid-column: span 4; }
+  .svc__card:first-child .svc__body { padding: var(--space-xl); }
+  .svc__card:first-child .svc__t { font-size: var(--text-3xl); }
+}
 
 /* ---------- Reviews ---------- */
 .reviews__grid { display: grid; gap: var(--space-2xl) var(--gap-columns); align-items: end; }
@@ -392,7 +423,6 @@ html:not(.js) .map__load { display: none; }
   .hero .actions .btn, .phero .actions .btn { flex: 0 0 auto; }
   .facts > div { grid-template-columns: 7.5rem minmax(0, 1fr); }
   .row { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
-  .svc { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .season__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .season__steps li { padding-inline: var(--space-lg); border-bottom: 0; border-left: 1px solid var(--color-rule); }
   .season__steps li:nth-child(odd) { padding-left: 0; border-left: 0; }
@@ -412,7 +442,6 @@ html:not(.js) .map__load { display: none; }
   .hero__in { padding-bottom: var(--space-xl); }
   .intro__facts { grid-column: 1 / span 3; padding-top: 0.6em; }
   .intro__text { grid-column: 4 / span 9; }
-  .svc { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .quotes { grid-column: 1 / span 8; }
   .score { grid-column: 10 / span 3; }
   .reel__frame { grid-column: 1 / span 4; }
