@@ -36,46 +36,121 @@
   }));
 
   /* ---------- Bestillingsskjema (/bestill/) ---------- */
-  // Sendes til /api/bestill (Cloudflare Pages Function som sender e-post). Finnes ikke serveren (forhåndsvisningen),
-  // lages en ferdig utfylt e-post til verkstedet i stedet. Ligger før bevegelseskoden, så det virker også med redusert bevegelse.
+  // Fire steg: bil, tjenester, tidspunkt, kontakt, med en oppsummering som fylles ut underveis. Sendes til /api/bestill
+  // (Cloudflare Pages Function som sender e-post); finnes ikke serveren (forhåndsvisningen), lages en ferdig utfylt e-post.
+  // Uten JS står alle stegene under hverandre og skjemaet postes vanlig. Ligger før bevegelseskoden, så det virker med redusert bevegelse.
   const booking = document.querySelector('[data-booking]');
   if (booking) {
-    const errBox = booking.querySelector('.booking__error'); const done = document.querySelector('.booking__done');
-    const btn = booking.querySelector('button[type="submit"]'); const label = btn.textContent;
-    const pre = new URLSearchParams(location.search).get('tjeneste');
-    const preR = pre && [...booking.querySelectorAll('input[name="tjeneste"]')].find((r) => r.dataset.slug === pre);
-    if (preR) preR.checked = true;
-    const day = booking.elements.dag;
+    const steps = [...booking.querySelectorAll('.step')];
+    const tabs = [...booking.querySelectorAll('[data-goto]')];
+    const prev = booking.querySelector('[data-prev]'), next = booking.querySelector('[data-next]'), send = booking.querySelector('[data-send]');
+    const errBox = booking.querySelector('.booking__error'), done = document.querySelector('.booking__done');
+    const plate = booking.elements.regnr, melding = booking.elements.melding, melH = booking.querySelector('[data-melding-h]');
+    const sendLabel = send.textContent, band = booking.querySelector('.skilt__band').outerHTML;
+    const UKE = ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'];
+    const MND = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
     const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-    day.min = iso(new Date());
-    day.addEventListener('change', () => {
-      const d = day.value ? new Date(day.value + 'T12:00') : null;
-      day.setCustomValidity(d && (d.getDay() === 0 || d.getDay() === 6) ? 'Verkstedet har stengt i helgene. Velg en hverdag.' : '');
+    const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    const cap = (v) => v.charAt(0).toUpperCase() + v.slice(1);
+    const today = iso(new Date());
+    let at = 0, reached = 0;
+
+    // Dagene: de neste ti hverdagene som knapper (etter kl. 14 starter vi på neste dag). Datofeltet er reserven uten JS.
+    booking.querySelector('[data-day-fallback]')?.remove();
+    const dag = new Date(); dag.setHours(12, 0, 0, 0);
+    if (new Date().getHours() >= 14) dag.setDate(dag.getDate() + 1);
+    let days = '<label class="day day--first"><input type="radio" name="dag" value="" checked><span><span class="day__d">Første</span><span class="day__m">ledige tid</span></span></label>';
+    for (let n = 0; n < 10; dag.setDate(dag.getDate() + 1)) {
+      if (dag.getDay() === 0 || dag.getDay() === 6) continue;
+      n += 1;
+      const v = iso(dag);
+      days += `<label class="day"><input type="radio" name="dag" value="${v}" aria-label="${UKE[dag.getDay()]} ${dag.getDate()}. ${MND[dag.getMonth()]}"><span><span class="day__w">${v === today ? 'i dag' : UKE[dag.getDay()].slice(0, 3)}</span><span class="day__d">${dag.getDate()}</span><span class="day__m">${MND[dag.getMonth()]}</span></span></label>`;
+    }
+    booking.querySelector('[data-days]').innerHTML = days;
+
+    // Knappene på resten av siden sender med ?tjeneste=, så riktig kort er valgt
+    const pre = new URLSearchParams(location.search).get('tjeneste');
+    booking.querySelectorAll('input[name="tjenester"]').forEach((c) => { if (pre && c.dataset.slug === pre) c.checked = true; });
+
+    // Skiltnummeret: store bokstaver, og mellomrom etter to bokstaver i vanlige skilt (AB 12345)
+    const fmt = (v) => { const t = v.toUpperCase().replace(/[^A-ZÆØÅ0-9]/g, '').slice(0, 8); return /^[A-ZÆØÅ]{2}\d/.test(t) ? `${t.slice(0, 2)} ${t.slice(2)}` : t; };
+    plate.addEventListener('input', () => {
+      const end = plate.selectionStart === plate.value.length, v = fmt(plate.value);
+      if (v !== plate.value) { plate.value = v; if (end) plate.setSelectionRange(v.length, v.length); }
     });
-    const msg = { tjeneste: 'Velg hva bilen trenger.', navn: 'Skriv inn navnet ditt.', telefon: 'Skriv inn et telefonnummer vi kan ringe deg på.', epost: 'Skriv inn en gyldig e-postadresse, eller la feltet stå tomt.', dag: 'Velg en dag fra i dag og fremover.' };
+
+    const data = () => {
+      const f = new FormData(booking), g = (k) => String(f.get(k) || '').trim();
+      return { tjenester: f.getAll('tjenester'), regnr: g('regnr'), dag: g('dag'), tid: g('tid') || 'Når som helst', navn: g('navn'), telefon: g('telefon'), epost: g('epost'), melding: g('melding'), firma: g('firma') };
+    };
+    const dagTekst = (v) => { if (!v) return 'første ledige tid'; const d = new Date(`${v}T12:00`); return `${v === today ? 'i dag, ' : ''}${UKE[d.getDay()]} ${d.getDate()}. ${MND[d.getMonth()]}`; };
+    const naar = (d) => `${cap(dagTekst(d.dag))}, ${d.tid.charAt(0).toLowerCase()}${d.tid.slice(1)}`;
+    const render = () => {
+      const d = data();
+      const html = `<p class="sum__t">Din bestilling</p>${d.regnr ? `<span class="skilt skilt--s">${band}<span class="skilt__txt">${esc(d.regnr)}</span></span>` : ''}<dl class="sum__l"><div><dt>Tjenester</dt><dd>${d.tjenester.length ? esc(d.tjenester.join(', ')) : '<span class="sum__empty">Ikke valgt ennå</span>'}</dd></div><div><dt>Når</dt><dd>${esc(naar(d))}</dd></div>${d.navn || d.telefon ? `<div><dt>Kontakt</dt><dd>${esc([d.navn, d.telefon].filter(Boolean).join(', '))}</dd></div>` : ''}</dl>`;
+      document.querySelectorAll('[data-summary]').forEach((el) => { el.innerHTML = html; });
+    };
+    const label = () => { next.textContent = at === 0 && !plate.value.trim() ? 'Hopp over' : 'Neste'; };
+    const annet = () => {
+      const on = !!booking.querySelector('input[name="tjenester"][value="Annet"]:checked');
+      melding.required = on; melH.textContent = on ? '(beskriv kort hva det gjelder)' : '(valgfritt)';
+    };
+
+    const show = (i, back = false) => {
+      at = i; reached = Math.max(reached, i);
+      steps.forEach((s, n) => { s.classList.toggle('is-active', n === i); s.classList.toggle('is-back', n === i && back); });
+      tabs.forEach((t, n) => {
+        if (n === i) t.setAttribute('aria-current', 'step'); else t.removeAttribute('aria-current');
+        t.disabled = n > reached; t.parentElement.classList.toggle('is-done', n !== i && n <= reached);
+      });
+      prev.hidden = i === 0; next.hidden = i === steps.length - 1; send.hidden = i !== steps.length - 1;
+      errBox.hidden = true; label();
+    };
+    const go = (i, back = false) => {
+      show(i, back);
+      if (booking.getBoundingClientRect().top < 0) booking.scrollIntoView({ block: 'start' });
+      steps[i].querySelector('.step__h').focus({ preventScroll: true });
+    };
+    const msg = { navn: 'Skriv inn navnet ditt.', telefon: 'Skriv inn et telefonnummer vi kan ringe deg på.', epost: 'Skriv inn en gyldig e-postadresse, eller la feltet stå tomt.', melding: 'Beskriv kort hva bilen trenger.' };
     const fail = (t, el) => { errBox.textContent = t; errBox.hidden = false; if (el) el.focus(); };
-    booking.addEventListener('input', () => { errBox.hidden = true; });
-    booking.addEventListener('change', () => { errBox.hidden = true; });
-    const norsk = (v) => (v ? v.split('-').reverse().join('.') : '');
+    const check = (i) => {
+      if (i === 0 && plate.value && plate.value.replace(/\s/g, '').length < 2) return ['Skriv hele skiltnummeret, for eksempel AB 12345.', plate];
+      if (i === 1 && !booking.querySelector('input[name="tjenester"]:checked')) return ['Velg minst én tjeneste.', booking.querySelector('input[name="tjenester"]')];
+      if (i === 3) for (const k of ['navn', 'telefon', 'epost', 'melding']) { const el = booking.elements[k]; if (!el.checkValidity()) return [msg[k], el]; }
+      return null;
+    };
+    const tryTo = (i) => {
+      for (let k = Math.min(at, i); k < i; k += 1) { const bad = check(k); if (bad) { if (k !== at) go(k, k < at); return fail(...bad); } }
+      go(i, i < at);
+    };
+    next.addEventListener('click', () => tryTo(at + 1));
+    prev.addEventListener('click', () => go(at - 1, true));
+    tabs.forEach((t, n) => t.addEventListener('click', () => (n > at ? tryTo(n) : go(n, n < at))));
+    booking.addEventListener('input', () => { errBox.hidden = true; label(); render(); });
+    booking.addEventListener('change', () => { errBox.hidden = true; annet(); render(); });
+
     const finish = (d, viaMail) => {
+      render();
+      done.querySelector('[data-done-h]').textContent = viaMail ? 'Nesten ferdig' : `Takk, ${d.navn.split(' ')[0]}!`;
       done.querySelector('[data-done-text]').textContent = viaMail
-        ? `E-posten med bestillingen er klar i e-postprogrammet ditt. Trykk send der, så tar vi kontakt på ${d.telefon}.`
-        : `Bestillingen er sendt, ${d.navn.split(' ')[0]}. Vi tar kontakt på ${d.telefon} for å bekrefte tiden.`;
-      booking.hidden = true; done.hidden = false; done.focus();
+        ? `E-posten med bestillingen er klar i e-postprogrammet ditt. Trykk send der, så ringer vi deg på ${d.telefon}.`
+        : `Bestillingen er sendt. Vi ringer deg på ${d.telefon} for å bekrefte tiden.`;
+      booking.hidden = true; document.querySelector('.booking__sum').hidden = true; done.hidden = false;
+      if (done.getBoundingClientRect().top < 0) done.scrollIntoView({ block: 'start' });
+      done.focus({ preventScroll: true });
     };
     const mailto = (d) => {
-      const subject = `Bestilling: ${d.tjeneste}${d.regnr ? ' – ' + d.regnr.toUpperCase() : ''}`;
-      const body = ['Bestilling fra nettsiden', '', `Tjeneste: ${d.tjeneste}`, `Registreringsnummer: ${(d.regnr || '-').toUpperCase()}`, `Ønsket dag: ${norsk(d.dag) || 'Når som helst'}`, `Tidspunkt: ${d.tid}`, `Navn: ${d.navn}`, `Telefon: ${d.telefon}`, `E-post: ${d.epost || '-'}`, '', 'Hva gjelder det:', d.melding || '-'].join('\n');
+      const subject = `Bestilling: ${d.tjenester.join(', ')}${d.regnr ? ' – ' + d.regnr : ''}`;
+      const body = ['Bestilling fra nettsiden', '', `Tjenester: ${d.tjenester.join(', ')}`, `Skiltnummer: ${d.regnr || '-'}`, `Når: ${naar(d)}`, `Navn: ${d.navn}`, `Telefon: ${d.telefon}`, `E-post: ${d.epost || '-'}`, '', 'Hva gjelder det:', d.melding || '-'].join('\n');
       return `mailto:${booking.dataset.mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     };
     booking.addEventListener('submit', async (e) => {
       e.preventDefault(); errBox.hidden = true;
-      if (day.value && day.value < day.min) day.setCustomValidity(msg.dag);
-      const bad = [...booking.elements].find((el) => el.willValidate && !el.checkValidity());
-      if (bad) return fail(bad.name === 'dag' && bad.validationMessage.startsWith('Verkstedet') ? bad.validationMessage : (msg[bad.name] || bad.validationMessage), bad);
-      const d = Object.fromEntries(new FormData(booking));
+      if (at < steps.length - 1) return tryTo(at + 1); // Enter i et felt går til neste steg
+      for (const k of [0, 1, 3]) { const bad = check(k); if (bad) { if (k !== at) go(k, true); return fail(...bad); } }
+      const d = data();
       if (d.firma) return;
-      btn.disabled = true; btn.textContent = 'Sender …';
+      send.disabled = true; send.textContent = 'Sender …';
       try {
         const r = await fetch(booking.action, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(d) });
         const j = await r.json().catch(() => null);
@@ -84,8 +159,9 @@
         throw new Error('ingen server');
       } catch (x) {
         location.href = mailto(d); finish(d, true);
-      } finally { btn.disabled = false; btn.textContent = label; }
+      } finally { send.disabled = false; send.textContent = sendLabel; }
     });
+    show(0); annet(); render();
   }
   syncMode();
 
