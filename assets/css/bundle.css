@@ -507,3 +507,43 @@ html:not(.js) .map__load { display: none; }
   .burger { display: none; }
 }
 @media (min-width: 87.5rem) { .nav__tel span { display: inline; } }
+
+/* ---------- Bestillingsskjema ---------- */
+.booking { padding-bottom: var(--section-gap); }
+/* Den flytende bestillingslinjen trengs ikke på selve bestillingssiden (og ville ligget over feltene) */
+body:has(.booking) .dock { display: none; }
+.booking__grid { display: grid; gap: var(--space-2xl); align-items: start; }
+.booking__form { display: grid; gap: var(--space-lg); }
+.booking__group { display: grid; gap: var(--space-xs); margin: 0; padding: 0; border: 0; min-width: 0; }
+.booking__group legend, .field__l { padding: 0; margin-bottom: var(--space-xs); font-size: var(--text-sm); font-weight: 600; color: var(--color-ink); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.chip { position: relative; display: inline-flex; }
+.chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.chip span { display: inline-flex; align-items: center; min-height: 48px; padding: 0 var(--space-md); border: 1px solid var(--color-muted); background: var(--color-paper); color: var(--color-ink); font-size: var(--text-md); transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out); }
+.chip:hover span { border-color: var(--color-ink); }
+.chip input:checked + span { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-ink); font-weight: 600; }
+.chip input:focus-visible + span { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.booking__row { display: grid; gap: var(--space-lg); }
+.field { display: grid; gap: 0; min-width: 0; }
+.field--short { max-width: 16rem; }
+.field__h { font-weight: 400; color: var(--color-muted); }
+.field input, .field select, .field textarea { width: 100%; min-height: 52px; padding: var(--space-sm); border: 1px solid var(--color-muted); border-radius: 0; background: var(--color-paper); color: var(--color-ink); font-size: max(16px, var(--text-md)); transition: border-color var(--dur-short) var(--ease-out); }
+.field textarea { min-height: 128px; resize: vertical; }
+.field input:hover, .field select:hover, .field textarea:hover { border-color: var(--color-ink-2); }
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; border-color: var(--color-ink); }
+.field input::placeholder { color: var(--color-muted); }
+.booking__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.booking__error { margin: 0; padding: var(--space-sm) var(--space-md); border: 1px solid var(--color-error); background: var(--color-paper-2); color: var(--color-ink); }
+.booking__send { display: grid; gap: var(--space-sm); justify-items: start; margin-top: var(--space-xs); }
+.booking__send .btn:disabled { background: var(--color-paper-3); border-color: var(--color-paper-3); color: var(--color-muted); cursor: progress; }
+.booking__done { display: grid; gap: var(--space-md); align-content: start; padding: var(--space-xl); background: var(--color-paper-2); border-top: 4px solid var(--color-accent); }
+.booking__done:focus { outline: none; }
+.booking__done h2 { font-size: var(--text-title); }
+.booking__aside { display: grid; gap: var(--space-md); justify-items: start; padding: var(--space-xl); background: var(--color-paper-2); }
+.booking__aside-t { margin: 0; font-size: var(--text-xl); font-weight: 600; color: var(--color-ink); }
+@media (min-width: 40.0625rem) { .booking__row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 60.0625rem) {
+  .booking__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .booking__form, .booking__done { grid-column: 1 / span 7; }
+  .booking__aside { grid-column: 9 / span 4; position: sticky; top: calc(var(--nav-h) + var(--space-lg)); }
+}

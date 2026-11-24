@@ -34,6 +34,59 @@
     f.src = btn.dataset.src; f.title = btn.dataset.title; f.referrerPolicy = 'no-referrer';
     const box = btn.closest('[data-map]'); box.replaceChildren(f); f.focus();
   }));
+
+  /* ---------- Bestillingsskjema (/bestill/) ---------- */
+  // Sendes til /api/bestill (Cloudflare Pages Function som sender e-post). Finnes ikke serveren (forhåndsvisningen),
+  // lages en ferdig utfylt e-post til verkstedet i stedet. Ligger før bevegelseskoden, så det virker også med redusert bevegelse.
+  const booking = document.querySelector('[data-booking]');
+  if (booking) {
+    const errBox = booking.querySelector('.booking__error'); const done = document.querySelector('.booking__done');
+    const btn = booking.querySelector('button[type="submit"]'); const label = btn.textContent;
+    const pre = new URLSearchParams(location.search).get('tjeneste');
+    const preR = pre && [...booking.querySelectorAll('input[name="tjeneste"]')].find((r) => r.dataset.slug === pre);
+    if (preR) preR.checked = true;
+    const day = booking.elements.dag;
+    const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    day.min = iso(new Date());
+    day.addEventListener('change', () => {
+      const d = day.value ? new Date(day.value + 'T12:00') : null;
+      day.setCustomValidity(d && (d.getDay() === 0 || d.getDay() === 6) ? 'Verkstedet har stengt i helgene. Velg en hverdag.' : '');
+    });
+    const msg = { tjeneste: 'Velg hva bilen trenger.', navn: 'Skriv inn navnet ditt.', telefon: 'Skriv inn et telefonnummer vi kan ringe deg på.', epost: 'Skriv inn en gyldig e-postadresse, eller la feltet stå tomt.', dag: 'Velg en dag fra i dag og fremover.' };
+    const fail = (t, el) => { errBox.textContent = t; errBox.hidden = false; if (el) el.focus(); };
+    booking.addEventListener('input', () => { errBox.hidden = true; });
+    booking.addEventListener('change', () => { errBox.hidden = true; });
+    const norsk = (v) => (v ? v.split('-').reverse().join('.') : '');
+    const finish = (d, viaMail) => {
+      done.querySelector('[data-done-text]').textContent = viaMail
+        ? `E-posten med bestillingen er klar i e-postprogrammet ditt. Trykk send der, så tar vi kontakt på ${d.telefon}.`
+        : `Bestillingen er sendt, ${d.navn.split(' ')[0]}. Vi tar kontakt på ${d.telefon} for å bekrefte tiden.`;
+      booking.hidden = true; done.hidden = false; done.focus();
+    };
+    const mailto = (d) => {
+      const subject = `Bestilling: ${d.tjeneste}${d.regnr ? ' – ' + d.regnr.toUpperCase() : ''}`;
+      const body = ['Bestilling fra nettsiden', '', `Tjeneste: ${d.tjeneste}`, `Registreringsnummer: ${(d.regnr || '-').toUpperCase()}`, `Ønsket dag: ${norsk(d.dag) || 'Når som helst'}`, `Tidspunkt: ${d.tid}`, `Navn: ${d.navn}`, `Telefon: ${d.telefon}`, `E-post: ${d.epost || '-'}`, '', 'Hva gjelder det:', d.melding || '-'].join('\n');
+      return `mailto:${booking.dataset.mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    };
+    booking.addEventListener('submit', async (e) => {
+      e.preventDefault(); errBox.hidden = true;
+      if (day.value && day.value < day.min) day.setCustomValidity(msg.dag);
+      const bad = [...booking.elements].find((el) => el.willValidate && !el.checkValidity());
+      if (bad) return fail(bad.name === 'dag' && bad.validationMessage.startsWith('Verkstedet') ? bad.validationMessage : (msg[bad.name] || bad.validationMessage), bad);
+      const d = Object.fromEntries(new FormData(booking));
+      if (d.firma) return;
+      btn.disabled = true; btn.textContent = 'Sender …';
+      try {
+        const r = await fetch(booking.action, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(d) });
+        const j = await r.json().catch(() => null);
+        if (r.ok && j && j.ok) return finish(d, false);
+        if (r.status === 400 && j && j.error) return fail(j.error);
+        throw new Error('ingen server');
+      } catch (x) {
+        location.href = mailto(d); finish(d, true);
+      } finally { btn.disabled = false; btn.textContent = label; }
+    });
+  }
   syncMode();
 
   /* ---------- Åpent nå, og dagens rad i tabellen ---------- */

@@ -12,7 +12,7 @@ In English: Express Bilservice AS is a car repair workshop in Ålesund, Norway (
 - E-post: verksted@expressbilservice.no
 - Åpningstider for verkstedet: mandag til fredag 08.00 til 16.00, stengt lørdag og søndag
 - Bilvask: automatisk, bare utvendig, åpen hele døgnet, alle dager
-- Bestill time: https://bestill.mekonomen.no/workshops?workshop=6060-013
+- Bestill time: https://www.expressbilservice.no/bestill/ (skjema på nettsiden, verkstedet tar kontakt og bekrefter tiden)
 - Eiere: Jan-Harald Ness og Steinar Aasen
 - Kjeder: Mekonomen og Fagdekk/Point S
 - Kart: https://www.google.com/maps/search/?api=1&query=Express%20Bilservice%20AS%2C%20Sj%C3%B8mannsvegen%207%2C%206008%20%C3%85lesund
@@ -32,12 +32,12 @@ In English: Express Bilservice AS is a car repair workshop in Ålesund, Norway (
 - Kan dere skifte eksosanlegget samme dag? Ja, eksosanlegg skifter vi på dagen. Ring 70 13 26 00 for time.
 - Kan jeg dele opp verkstedregningen? Ja. Du kan dele opp betalingen over 4 eller 12 måneder uten nominell rente.
 - Hvilke biler tar dere? Uansett bil eller årsmodell hjelper vi deg.
-- Hvordan bestiller jeg time? Bestill på nett hos Mekonomen, ring 70 13 26 00 eller send e-post til verksted@expressbilservice.no.
+- Hvordan bestiller jeg time? Fyll ut skjemaet under «Bestill time», ring 70 13 26 00 eller send e-post til verksted@expressbilservice.no. Vi tar kontakt og bekrefter tiden.
 - Når kan jeg bruke piggdekk i Ålesund? Fra 1. november til og med første søndag etter 2. påskedag. Krever føret det, er piggdekk lov også utenom perioden. Kilde: Statens vegvesen.
 - Hvor mye mønster må vinterdekkene ha? Minst 3 mm i vinterperioden, fra 1. november til og med første søndag etter 2. påskedag. Resten av året er kravet minst 1,6 mm. Dette gjelder biler opp til 3500 kg.
 - Har dere dekkhotell? Ja. Vi lagrer hjulene dine mellom sesongene og skifter når du kommer.
 - Har dere dekk til varebil? Ja. Vi har person- og varebildekk, og dekk til lette lastebiler.
-- Hvordan bestiller jeg dekkskift? Bestill på nett hos Mekonomen eller ring 70 13 26 00.
+- Hvordan bestiller jeg dekkskift? Velg «Dekkskift eller dekkhotell» i bestillingsskjemaet, eller ring 70 13 26 00.
 - Er bilvasken åpen om natten? Ja. Bilvasken er automatisk og åpen hele døgnet, alle dager.
 - Må jeg bestille time til bilvask? Nei. Maskinen er automatisk og åpen hele døgnet, så du kommer når det passer deg.
 - Hvor ligger bilvasken? Lengst til venstre i bygget i Sjømannsvegen 7, 6008 Ålesund, under Bilvask-skiltet, 200 meter øst for Color Line Stadion.
