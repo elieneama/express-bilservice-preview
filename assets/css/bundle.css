@@ -538,7 +538,7 @@ body:has(.booking) .dock { display: none; }
 .step__h { float: left; width: 100%; margin: 0 0 var(--space-2xs); padding: 0; font-size: var(--text-title); font-weight: 600; line-height: 1.15; color: var(--color-ink); }
 .step__h:focus { outline: none; }
 .step__lead { clear: both; margin: 0 0 var(--space-lg); color: var(--color-muted); }
-.step > .field, .step > .booking__row, .step > .seg, .step > .sum { margin-top: var(--space-lg); }
+.step > .field, .step > .booking__row, .step > .seg, .step > .sum, .step > .cal { margin-top: var(--space-lg); }
 
 /* Bilskiltet: hvitt skilt med blått felt, norsk flagg og N */
 .skilt { display: flex; align-items: stretch; width: min(100%, 24rem); height: 5.5rem; border: 3px solid var(--color-plate-edge); border-radius: 10px; background: var(--color-plate-paper); color: var(--color-plate-text); overflow: hidden; cursor: text; }
@@ -558,6 +558,15 @@ body:has(.booking) .dock { display: none; }
 .skilt--s .skilt__band b { font-size: var(--text-xs); }
 .skilt__txt { display: flex; align-items: center; padding: 0 var(--space-sm); font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
+/* Kilometerstanden: som telleren i et dashbord */
+.step > .km-f { margin-top: var(--space-xl); }
+.km { display: flex; align-items: center; width: min(100%, 16rem); height: 4rem; padding: 0 var(--space-md); border: 2px solid var(--color-night); background: var(--color-night); color: var(--color-night-ink); cursor: text; }
+.km:has(input:focus-visible) { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+.field .km input, .field .km input:hover { flex: 1 1 auto; min-width: 0; width: 100%; min-height: 0; padding: 0; border: 0; background: transparent; color: var(--color-night-ink); font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; font-variant-numeric: tabular-nums; }
+.field .km input:focus-visible { outline: 0; }
+.field .km input::placeholder { color: var(--color-night-muted); opacity: 1; }
+.km__u { flex: 0 0 auto; margin-left: var(--space-xs); font-size: var(--text-md); color: var(--color-night-muted); }
+
 /* Tjenestekortene: velg én eller flere */
 .tj { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xs); }
 .tj__c { position: relative; display: grid; min-width: 0; }
@@ -574,21 +583,37 @@ body:has(.booking) .dock { display: none; }
 .tj__c input:checked + .tj__b .tj__k { background: var(--color-accent-ink); border-color: var(--color-accent-ink); stroke: var(--color-accent); }
 .tj__c input:focus-visible + .tj__b { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 
-/* Dagene som knapper (lages av JS), datofeltet er reserven uten JS */
-.days { display: none; }
-.js .days { display: flex; gap: var(--space-xs); overflow-x: auto; padding: var(--space-2xs) var(--space-2xs) var(--space-xs); scroll-snap-type: x proximity; scrollbar-width: thin; }
+/* Når: «Når som helst» eller en dag i kalenderen (lages av JS). Datofeltet er reserven uten JS. */
+.when { display: none; }
+.js .when { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xs); max-width: 32rem; }
 .js [data-day-fallback] { display: none; }
-.day { position: relative; flex: 0 0 auto; scroll-snap-align: start; }
-.day input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.day > span { display: grid; justify-items: center; align-content: center; gap: var(--space-3xs); min-width: 4.5rem; min-height: 5.5rem; padding: var(--space-xs) var(--space-sm); border: 1px solid var(--color-rule); background: var(--color-paper); color: var(--color-ink); transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out); }
-.day__w, .day__m { font-size: var(--text-sm); color: var(--color-muted); }
-.day__d { font-size: var(--text-xl); font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.day--first > span { min-width: 6.5rem; }
-.day--first .day__d { font-size: var(--text-md); }
-.day:hover > span { border-color: var(--color-ink); }
-.day input:checked + span { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-ink); }
-.day input:checked + span .day__w, .day input:checked + span .day__m { color: var(--color-accent-ink); }
-.day input:focus-visible + span { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.when__o { position: relative; display: grid; min-width: 0; }
+.when__o input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.when__b { display: grid; align-content: start; gap: var(--space-3xs); min-height: 7rem; padding: var(--space-md); border: 1px solid var(--color-rule); background: var(--color-paper); color: var(--color-ink); transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out); }
+.when__i { width: 28px; height: 28px; margin-bottom: var(--space-xs); fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.when__t { font-size: var(--text-md); font-weight: 600; line-height: 1.25; }
+.when__d { font-size: var(--text-sm); color: var(--color-muted); }
+.when__o:hover .when__b { border-color: var(--color-ink); }
+.when__o input:checked + .when__b { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-ink); }
+.when__o input:checked + .when__b .when__d { color: var(--color-accent-ink); }
+.when__o input:focus-visible + .when__b { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.cal { max-width: 26rem; padding: var(--space-md); border: 1px solid var(--color-rule); background: var(--color-paper); }
+.cal__h { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+.cal__m { margin: 0; font-size: var(--text-lg); font-weight: 600; color: var(--color-ink); }
+.cal__nav { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--color-rule); background: var(--color-paper); color: var(--color-ink); cursor: pointer; transition: border-color var(--dur-short) var(--ease-out); }
+.cal__nav svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cal__nav:hover:not(:disabled) { border-color: var(--color-ink); }
+.cal__nav:disabled { color: var(--color-rule); cursor: default; }
+.cal__nav:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.cal__g { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--space-3xs); }
+.cal__wd { padding: var(--space-2xs) 0; font-size: var(--text-sm); color: var(--color-muted); text-align: center; }
+.cal__d { display: grid; place-items: center; min-height: 44px; aspect-ratio: 1; padding: 0; border: 1px solid transparent; background: none; color: var(--color-ink); font: inherit; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out); }
+.cal__d:not(:disabled) { background: var(--color-paper-2); }
+.cal__d.is-today { border-color: var(--color-rule); }
+.cal__d:hover:not(:disabled) { border-color: var(--color-ink); }
+.cal__d:disabled { font-weight: 400; color: var(--color-muted); cursor: default; }
+.cal__d[aria-pressed="true"] { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-ink); }
+.cal__d:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .seg { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 .chip { position: relative; display: inline-flex; }
 .chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }

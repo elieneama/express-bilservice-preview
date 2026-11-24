@@ -55,18 +55,57 @@
     const today = iso(new Date());
     let at = 0, reached = 0;
 
-    // Dagene: de neste ti hverdagene som knapper (etter kl. 14 starter vi på neste dag). Datofeltet er reserven uten JS.
+    // Når: «Når som helst» (første ledige tid) eller en dag i kalenderen. Datofeltet er reserven uten JS.
     booking.querySelector('[data-day-fallback]')?.remove();
-    const dag = new Date(); dag.setHours(12, 0, 0, 0);
-    if (new Date().getHours() >= 14) dag.setDate(dag.getDate() + 1);
-    let days = '<label class="day day--first"><input type="radio" name="dag" value="" checked><span><span class="day__d">Første</span><span class="day__m">ledige tid</span></span></label>';
-    for (let n = 0; n < 10; dag.setDate(dag.getDate() + 1)) {
-      if (dag.getDay() === 0 || dag.getDay() === 6) continue;
-      n += 1;
-      const v = iso(dag);
-      days += `<label class="day"><input type="radio" name="dag" value="${v}" aria-label="${UKE[dag.getDay()]} ${dag.getDate()}. ${MND[dag.getMonth()]}"><span><span class="day__w">${v === today ? 'i dag' : UKE[dag.getDay()].slice(0, 3)}</span><span class="day__d">${dag.getDate()}</span><span class="day__m">${MND[dag.getMonth()]}</span></span></label>`;
-    }
-    booking.querySelector('[data-days]').innerHTML = days;
+    const cal = booking.querySelector('[data-cal]'), tidBox = booking.querySelector('[data-tid]');
+    const dagInput = Object.assign(document.createElement('input'), { type: 'hidden', name: 'dag', value: '' });
+    cal.after(dagInput);
+    const MND_L = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
+    const first = new Date(); first.setHours(12, 0, 0, 0);
+    if (new Date().getHours() >= 14) first.setDate(first.getDate() + 1); // etter kl. 14 starter vi på neste dag
+    const last = new Date(first); last.setMonth(last.getMonth() + 3);
+    const minIso = iso(first), maxIso = iso(last);
+    let view = new Date(first.getFullYear(), first.getMonth(), 1, 12);
+    const pil = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${d}"/></svg>`;
+    const drawCal = (fokus) => {
+      const y = view.getFullYear(), m = view.getMonth(), start = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate();
+      let cells = ['ma', 'ti', 'on', 'to', 'fr', 'lø', 'sø'].map((w) => `<span class="cal__wd" aria-hidden="true">${w}</span>`).join('') + '<span></span>'.repeat(start);
+      for (let d = 1; d <= n; d += 1) {
+        const dt = new Date(y, m, d, 12), v = iso(dt), helg = dt.getDay() === 0 || dt.getDay() === 6, av = helg || v < minIso || v > maxIso;
+        cells += `<button type="button" class="cal__d${v === today ? ' is-today' : ''}" data-d="${v}" aria-pressed="${v === dagInput.value}" aria-label="${UKE[dt.getDay()]} ${d}. ${MND_L[m]}${helg ? ', stengt' : ''}" tabindex="-1"${av ? ' disabled' : ''}>${d}</button>`;
+      }
+      const forste = y === first.getFullYear() && m === first.getMonth(), siste = y === last.getFullYear() && m === last.getMonth();
+      cal.innerHTML = `<div class="cal__h"><button type="button" class="cal__nav" data-cal-step="-1" aria-label="Forrige måned"${forste ? ' disabled' : ''}>${pil('m15 18-6-6 6-6')}</button><p class="cal__m" aria-live="polite">${cap(MND_L[m])} ${y}</p><button type="button" class="cal__nav" data-cal-step="1" aria-label="Neste måned"${siste ? ' disabled' : ''}>${pil('m9 18 6-6-6-6')}</button></div><div class="cal__g">${cells}</div>`;
+      const dager = [...cal.querySelectorAll('.cal__d:not(:disabled)')];
+      const tab = dager.find((b) => b.dataset.d === (fokus || dagInput.value)) || dager[0];
+      if (tab) { tab.tabIndex = 0; if (fokus) tab.focus(); }
+    };
+    cal.addEventListener('click', (e) => {
+      const nav = e.target.closest('[data-cal-step]');
+      if (nav) { view = new Date(view.getFullYear(), view.getMonth() + Number(nav.dataset.calStep), 1, 12); drawCal(); return; }
+      const b = e.target.closest('.cal__d');
+      if (b && !b.disabled) { dagInput.value = b.dataset.d; drawCal(b.dataset.d); tidBox.hidden = false; errBox.hidden = true; render(); }
+    });
+    // Piltaster flytter mellom åpne dager, også over til neste eller forrige måned
+    cal.addEventListener('keydown', (e) => {
+      const b = e.target.closest('.cal__d'), step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+      if (!b || !step) return;
+      e.preventDefault();
+      const d = new Date(`${b.dataset.d}T12:00`);
+      for (let k = 0; k < 14; k += 1) {
+        d.setDate(d.getDate() + step);
+        const v = iso(d);
+        if (v < minIso || v > maxIso) return;
+        if (d.getDay() % 6 !== 0) { view = new Date(d.getFullYear(), d.getMonth(), 1, 12); drawCal(v); return; }
+      }
+    });
+    const naarSet = () => {
+      const dato = booking.querySelector('input[name="naar"]:checked')?.value === 'dato';
+      if (dato && !cal.innerHTML) drawCal();
+      cal.hidden = !dato; tidBox.hidden = !dato || !dagInput.value;
+    };
+    booking.querySelectorAll('input[name="naar"]').forEach((r) => r.addEventListener('change', naarSet));
+    naarSet();
 
     // Knappene på resten av siden sender med ?tjeneste=, så riktig kort er valgt
     const pre = new URLSearchParams(location.search).get('tjeneste');
@@ -79,18 +118,24 @@
       if (v !== plate.value) { plate.value = v; if (end) plate.setSelectionRange(v.length, v.length); }
     });
 
+    // Kilometerstanden: bare tall, med mellomrom mellom tusener (145 000)
+    const km = booking.elements.km;
+    km.addEventListener('input', () => {
+      const end = km.selectionStart === km.value.length, v = km.value.replace(/\D/g, '').slice(0, 7).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      if (v !== km.value) { km.value = v; if (end) km.setSelectionRange(v.length, v.length); }
+    });
+
     const data = () => {
-      const f = new FormData(booking), g = (k) => String(f.get(k) || '').trim();
-      return { tjenester: f.getAll('tjenester'), regnr: g('regnr'), dag: g('dag'), tid: g('tid') || 'Når som helst', navn: g('navn'), telefon: g('telefon'), epost: g('epost'), melding: g('melding'), firma: g('firma') };
+      const f = new FormData(booking), g = (k) => String(f.get(k) || '').trim(), dato = g('naar') === 'dato' && g('dag');
+      return { tjenester: f.getAll('tjenester'), regnr: g('regnr'), km: g('km'), dag: dato ? g('dag') : '', tid: dato ? g('tid') || 'Hele dagen' : 'Når som helst', navn: g('navn'), telefon: g('telefon'), epost: g('epost'), melding: g('melding'), firma: g('firma') };
     };
     const dagTekst = (v) => { if (!v) return 'første ledige tid'; const d = new Date(`${v}T12:00`); return `${v === today ? 'i dag, ' : ''}${UKE[d.getDay()]} ${d.getDate()}. ${MND[d.getMonth()]}`; };
-    const naar = (d) => `${cap(dagTekst(d.dag))}, ${d.tid.charAt(0).toLowerCase()}${d.tid.slice(1)}`;
+    const naar = (d) => (d.dag ? `${cap(dagTekst(d.dag))}, ${d.tid.charAt(0).toLowerCase()}${d.tid.slice(1)}` : 'Når som helst, første ledige tid');
     const render = () => {
       const d = data();
-      const html = `<p class="sum__t">Din bestilling</p>${d.regnr ? `<span class="skilt skilt--s">${band}<span class="skilt__txt">${esc(d.regnr)}</span></span>` : ''}<dl class="sum__l"><div><dt>Tjenester</dt><dd>${d.tjenester.length ? esc(d.tjenester.join(', ')) : '<span class="sum__empty">Ikke valgt ennå</span>'}</dd></div><div><dt>Når</dt><dd>${esc(naar(d))}</dd></div>${d.navn || d.telefon ? `<div><dt>Kontakt</dt><dd>${esc([d.navn, d.telefon].filter(Boolean).join(', '))}</dd></div>` : ''}</dl>`;
+      const html = `<p class="sum__t">Din bestilling</p>${d.regnr ? `<span class="skilt skilt--s">${band}<span class="skilt__txt">${esc(d.regnr)}</span></span>` : ''}<dl class="sum__l">${d.km ? `<div><dt>Kilometerstand</dt><dd>${esc(d.km)} km</dd></div>` : ''}<div><dt>Tjenester</dt><dd>${d.tjenester.length ? esc(d.tjenester.join(', ')) : '<span class="sum__empty">Ikke valgt ennå</span>'}</dd></div><div><dt>Når</dt><dd>${esc(naar(d))}</dd></div>${d.navn || d.telefon ? `<div><dt>Kontakt</dt><dd>${esc([d.navn, d.telefon].filter(Boolean).join(', '))}</dd></div>` : ''}</dl>`;
       document.querySelectorAll('[data-summary]').forEach((el) => { el.innerHTML = html; });
     };
-    const label = () => { next.textContent = at === 0 && !plate.value.trim() ? 'Hopp over' : 'Neste'; };
     const annet = () => {
       const on = !!booking.querySelector('input[name="tjenester"][value="Annet"]:checked');
       melding.required = on; melH.textContent = on ? '(beskriv kort hva det gjelder)' : '(valgfritt)';
@@ -104,7 +149,7 @@
         t.disabled = n > reached; t.parentElement.classList.toggle('is-done', n !== i && n <= reached);
       });
       prev.hidden = i === 0; next.hidden = i === steps.length - 1; send.hidden = i !== steps.length - 1;
-      errBox.hidden = true; label();
+      errBox.hidden = true;
     };
     const go = (i, back = false) => {
       show(i, back);
@@ -115,7 +160,9 @@
     const fail = (t, el) => { errBox.textContent = t; errBox.hidden = false; if (el) el.focus(); };
     const check = (i) => {
       if (i === 0 && plate.value && plate.value.replace(/\s/g, '').length < 2) return ['Skriv hele skiltnummeret, for eksempel AB 12345.', plate];
+      if (i === 0 && !km.value.trim()) return ['Skriv inn kilometerstanden. Omtrent er greit.', km];
       if (i === 1 && !booking.querySelector('input[name="tjenester"]:checked')) return ['Velg minst én tjeneste.', booking.querySelector('input[name="tjenester"]')];
+      if (i === 2 && booking.querySelector('input[name="naar"]:checked')?.value === 'dato' && !dagInput.value) return ['Velg en dag i kalenderen, eller velg Når som helst.', cal.querySelector('.cal__d[tabindex="0"]')];
       if (i === 3) for (const k of ['navn', 'telefon', 'epost', 'melding']) { const el = booking.elements[k]; if (!el.checkValidity()) return [msg[k], el]; }
       return null;
     };
@@ -126,7 +173,7 @@
     next.addEventListener('click', () => tryTo(at + 1));
     prev.addEventListener('click', () => go(at - 1, true));
     tabs.forEach((t, n) => t.addEventListener('click', () => (n > at ? tryTo(n) : go(n, n < at))));
-    booking.addEventListener('input', () => { errBox.hidden = true; label(); render(); });
+    booking.addEventListener('input', () => { errBox.hidden = true; render(); });
     booking.addEventListener('change', () => { errBox.hidden = true; annet(); render(); });
 
     const finish = (d, viaMail) => {
@@ -141,13 +188,13 @@
     };
     const mailto = (d) => {
       const subject = `Bestilling: ${d.tjenester.join(', ')}${d.regnr ? ' – ' + d.regnr : ''}`;
-      const body = ['Bestilling fra nettsiden', '', `Tjenester: ${d.tjenester.join(', ')}`, `Skiltnummer: ${d.regnr || '-'}`, `Når: ${naar(d)}`, `Navn: ${d.navn}`, `Telefon: ${d.telefon}`, `E-post: ${d.epost || '-'}`, '', 'Hva gjelder det:', d.melding || '-'].join('\n');
+      const body = ['Bestilling fra nettsiden', '', `Tjenester: ${d.tjenester.join(', ')}`, `Skiltnummer: ${d.regnr || '-'}`, `Kilometerstand: ${d.km} km`, `Når: ${naar(d)}`, `Navn: ${d.navn}`, `Telefon: ${d.telefon}`, `E-post: ${d.epost || '-'}`, '', 'Hva gjelder det:', d.melding || '-'].join('\n');
       return `mailto:${booking.dataset.mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     };
     booking.addEventListener('submit', async (e) => {
       e.preventDefault(); errBox.hidden = true;
       if (at < steps.length - 1) return tryTo(at + 1); // Enter i et felt går til neste steg
-      for (const k of [0, 1, 3]) { const bad = check(k); if (bad) { if (k !== at) go(k, true); return fail(...bad); } }
+      for (const k of [0, 1, 2, 3]) { const bad = check(k); if (bad) { if (k !== at) go(k, true); return fail(...bad); } }
       const d = data();
       if (d.firma) return;
       send.disabled = true; send.textContent = 'Sender …';
